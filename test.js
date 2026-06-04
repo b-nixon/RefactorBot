@@ -72,8 +72,7 @@ async function refactorCode() {
 
     try {
 
-        // Replace this section with your API call
-        const result = await testRefactor(originalCode);
+        const result = await codeRefactor(originalCode);
 
         showDiff(
             originalCode,
