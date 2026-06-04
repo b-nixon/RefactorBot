@@ -1,23 +1,20 @@
-// ── State ──
-let originalContent  = null;
-let modifiedContent  = null;
+let originalContent = null;
+let modifiedContent = null;
 let originalFilename = '';
 let modifiedFilename = '';
-let diffEditor       = null;
+let diffEditor = null;
+let editableEditor = null;
 
-// ── Monaco Setup ──
 require.config({
   paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' }
 });
 
 require(['vs/editor/editor.main'], function () {
-  // Monaco is ready — wire up file inputs now
   document.getElementById('fileOriginal').addEventListener('change', e => handleFile(e, 'original'));
   document.getElementById('fileModified').addEventListener('change', e => handleFile(e, 'modified'));
   document.getElementById('inlineToggle').addEventListener('change', toggleInlineMode);
 });
 
-// ── File Reading ──
 function handleFile(event, side) {
   const file = event.target.files[0];
   if (!file) return;
@@ -36,18 +33,15 @@ function handleFile(event, side) {
       markLoaded('Modified', file.name);
     }
 
-    // Both files loaded — show the diff
     if (originalContent !== null && modifiedContent !== null) {
       showDiff();
     }
   };
   reader.readAsText(file);
 
-  // Reset input so the same file can be re-uploaded
   event.target.value = '';
 }
 
-// ── Mark Upload Button as Loaded ──
 function markLoaded(side, filename) {
   const btn   = document.querySelector(`#slot${side} .upload-btn`);
   const label = document.getElementById(`label${side}`);
@@ -58,61 +52,72 @@ function markLoaded(side, filename) {
   badge.textContent = '';
 }
 
-// ── Show Monaco Diff ──
 function showDiff() {
   const lang = detectLanguage(originalFilename || modifiedFilename);
 
-  document.getElementById('emptyState').style.display  = 'none';
-  document.getElementById('monacoEditor').style.display = 'block';
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('workspace').style.display = 'flex';
 
-  if (diffEditor) {
-    // Update existing editor models
-    diffEditor.getOriginalEditor().getModel().setValue(originalContent);
-    diffEditor.getModifiedEditor().getModel().setValue(modifiedContent);
-  } else {
-    // Create fresh diff editor
-    diffEditor = monaco.editor.createDiffEditor(
-      document.getElementById('monacoEditor'),
+  if (!editableEditor) {
+    editableEditor = monaco.editor.create(
+      document.getElementById('editableEditor'),
       {
-        theme:               'vs-dark',
-        renderSideBySide:    true,
-        readOnly:            true,
-        fontSize:            13,
-        fontFamily:          "'IBM Plex Mono', monospace",
-        lineNumbers:         'on',
-        scrollBeyondLastLine: false,
-        minimap:             { enabled: true },
-        scrollbar:           { verticalScrollbarSize: 6, horizontalScrollbarSize: 6 },
-        renderLineHighlight: 'none',
-        padding:             { top: 12 },
+        value: originalContent,
+        language: lang,
+        theme: 'vs-dark',
+        fontSize: 13,
+        fontFamily: "'IBM Plex Mono', monospace",
+        minimap: { enabled: false }
       }
     );
 
-    diffEditor.setModel({
-      original: monaco.editor.createModel(originalContent, lang),
-      modified: monaco.editor.createModel(modifiedContent, lang),
+    editableEditor.onDidChangeModelContent(() => {
+      originalContent = editableEditor.getValue();
+
+      diffEditor.setModel({
+        original: monaco.editor.createModel(originalContent, lang),
+        modified: monaco.editor.createModel(modifiedContent, lang)
+      });
+
+      updateStatusBar();
     });
   }
+
+  if (!diffEditor) {
+    diffEditor = monaco.editor.createDiffEditor(
+      document.getElementById('diffViewer'),
+      {
+        theme: 'vs-dark',
+        renderSideBySide: false,
+        readOnly: true,
+        fontSize: 13,
+        fontFamily: "'IBM Plex Mono', monospace"
+      }
+    );
+  }
+
+  editableEditor.setValue(originalContent);
+
+  diffEditor.setModel({
+    original: monaco.editor.createModel(originalContent, lang),
+    modified: monaco.editor.createModel(modifiedContent, lang)
+  });
 
   updateStatusBar();
 }
 
-// ── Inline / Side-by-side Toggle ──
 function toggleInlineMode() {
   if (!diffEditor) return;
   const inline = document.getElementById('inlineToggle').checked;
   diffEditor.updateOptions({ renderSideBySide: !inline });
 }
 
-// ── Status Bar ──
 function updateStatusBar() {
   const bar = document.getElementById('statusBar');
 
-  // Compute line-level diff counts
   const origLines = (originalContent || '').split('\n');
   const modLines  = (modifiedContent  || '').split('\n');
 
-  // Simple line count stats (Monaco handles the real diff rendering)
   const added   = Math.max(0, modLines.length - origLines.length);
   const removed = Math.max(0, origLines.length - modLines.length);
 
@@ -135,14 +140,12 @@ function updateStatusBar() {
   `;
 }
 
-// ── Clear All ──
 function clearAll() {
   originalContent  = null;
   modifiedContent  = null;
   originalFilename = '';
   modifiedFilename = '';
 
-  // Reset upload buttons
   ['Original', 'Modified'].forEach(side => {
     const btn   = document.querySelector(`#slot${side} .upload-btn`);
     const label = document.getElementById(`label${side}`);
@@ -150,19 +153,22 @@ function clearAll() {
     label.textContent = `Upload ${side}`;
   });
 
-  // Destroy editor
   if (diffEditor) {
     diffEditor.dispose();
     diffEditor = null;
   }
 
-  document.getElementById('monacoEditor').style.display = 'none';
+  if (editableEditor) {
+    editableEditor.dispose();
+    editableEditor = null;
+  }
+
+  document.getElementById('workspace').style.display = 'none';
   document.getElementById('emptyState').style.display   = 'flex';
   document.getElementById('statusBar').innerHTML =
     '<span class="status-hint">Upload two files to compare them</span>';
 }
 
-// ── Language Detection ──
 function detectLanguage(filename) {
   const ext = filename.split('.').pop().toLowerCase();
   const map = {

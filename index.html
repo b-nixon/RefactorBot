@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Diff Viewer</title>
+  <title>RefactorBot</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -26,7 +26,7 @@
   <!-- Upload Bar -->
   <div class="upload-bar">
     <div class="upload-slot" id="slotOriginal">
-      <input type="file" id="fileOriginal" accept=".js,.ts,.jsx,.tsx,.py,.css,.html,.json,.txt,.md,.java,.c,.cpp,.cs,.go,.rs,.rb,.php" />
+      <input type="file" id="fileOriginal" accept=".js,.py,.java,.cpp,.cs,.rs" />
       <button class="upload-btn" onclick="document.getElementById('fileOriginal').click()">
         <span class="upload-icon">↑</span>
         <span id="labelOriginal">Upload Original</span>
@@ -37,7 +37,7 @@
     <div class="upload-divider">vs</div>
 
     <div class="upload-slot" id="slotModified">
-      <input type="file" id="fileModified" accept=".js,.ts,.jsx,.tsx,.py,.css,.html,.json,.txt,.md,.java,.c,.cpp,.cs,.go,.rs,.rb,.php" />
+      <input type="file" id="fileModified" accept=".js,.py,.java,.cpp,.cs,.rs" />
       <button class="upload-btn" onclick="document.getElementById('fileModified').click()">
         <span class="upload-icon">↑</span>
         <span id="labelModified">Upload Modified</span>
@@ -54,14 +54,19 @@
   </div>
 
   <!-- Editor Container -->
-  <div id="editorContainer">
-    <div class="empty-state" id="emptyState">
-      <div class="empty-icon">⇄</div>
-      <div class="empty-title">No files loaded</div>
-      <div class="empty-sub">Upload an original and modified file above to see the diff</div>
+<div id="editorContainer">
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">⇄</div>
+    <div class="empty-title">No files loaded</div>
+    <div class="empty-sub">
     </div>
-    <div id="monacoEditor"></div>
   </div>
+
+  <div id="workspace">
+    <div id="editableEditor"></div>
+    <div id="diffViewer"></div>
+  </div>
+</div>
 
   <!-- Monaco from CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
