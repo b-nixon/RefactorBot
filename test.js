@@ -11,7 +11,6 @@ require.config({
 });
 
 require(["vs/editor/editor.main"], function () {
-
     document
         .getElementById("fileOriginal")
         .addEventListener("change", loadFile);
@@ -20,7 +19,6 @@ require(["vs/editor/editor.main"], function () {
 });
 
 function createEditors() {
-
     editor = monaco.editor.create(
         document.getElementById("editableEditor"),
         {
@@ -42,7 +40,6 @@ function createEditors() {
 }
 
 function loadFile(event) {
-
     const file = event.target.files[0];
 
     if (!file) {
@@ -66,7 +63,6 @@ function loadFile(event) {
 }
 
 async function refactorCode() {
-
     originalCode = editor.getValue();
 
     if (originalCode.trim() === "") {
@@ -77,7 +73,7 @@ async function refactorCode() {
     try {
 
         // Replace this section with your API call
-        const result = await fakeRefactor(originalCode);
+        const result = await testRefactor(originalCode);
 
         showDiff(
             originalCode,
@@ -96,7 +92,6 @@ async function refactorCode() {
 }
 
 function showDiff(original, refactored) {
-
     const language =
         detectLanguage(originalFilename);
 
@@ -119,7 +114,6 @@ function showDiff(original, refactored) {
 }
 
 function detectLanguage(filename) {
-
     const ext =
         filename.split(".").pop().toLowerCase();
 
@@ -131,20 +125,66 @@ function detectLanguage(filename) {
         cpp: "cpp",
         c: "cpp",
         cs: "csharp",
-        html: "html",
-        css: "css"
     };
 
     return map[ext] || "plaintext";
 }
 
 
-async function fakeRefactor(code) {
-
+async function testRefactor(code) {
     return {
         refactoredCode:
             code.replaceAll("var ", "let "),
         reasoning:
             "Changed var declarations to let declarations."
     };
+}
+
+async function refactorCode() {
+    const code = editor.getValue();
+    const API_KEY = "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"
+
+    try{
+        const response = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${API_KEY}`
+            },
+            body: JSON.stringify({
+                model: "gpt-3.5-turbo",
+                messages: [
+                    {
+                        role: "system",
+                        content: `
+                        You exist solely to refactor code.
+                        Return only valid JSON:
+                        
+                        {
+                        "refactoredCode": "...",
+                        "reasoning": "..."
+                        }`
+                    },
+                    {
+                        role: "user",
+                        content: code
+                    }
+                ]
+            })
+        }
+        );
+
+        const data = await response.json();
+
+        const result = JSON.parse(data.choices[0].message.content);
+
+        showDiff(code, result.refactoredCode);
+
+        document.getElementById("aiReasoning").textContent = result.reasoning;
+    }   catch (error) {
+            console.error(error);
+            alert("Refactoring failed.");
+        }
 }
