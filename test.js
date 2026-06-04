@@ -72,7 +72,7 @@ async function refactorCode() {
 
     try {
 
-        const result = await codeRefactor(originalCode);
+        const result = await AIRefactor(originalCode);
 
         showDiff(
             originalCode,
@@ -139,8 +139,7 @@ async function testRefactor(code) {
     };
 }
 
-async function refactorCode() {
-    const code = editor.getValue();
+async function AIRefactor(code){
     const API_KEY = "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"
 
     try{
