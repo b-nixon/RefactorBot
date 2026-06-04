@@ -8,7 +8,6 @@
 </head>
 <body>
 
-  <!-- Header -->
   <header>
     <div class="header-left">
       <span class="logo">⇄</span>
@@ -23,7 +22,6 @@
     </div>
   </header>
 
-  <!-- Upload Bar -->
   <div class="upload-bar">
     <div class="upload-slot" id="slotOriginal">
       <input type="file" id="fileOriginal" accept=".js,.py,.java,.cpp,.cs,.rs" />
@@ -45,15 +43,20 @@
       <span class="file-badge" id="badgeModified"></span>
     </div>
 
-    <button class="clear-btn" onclick="clearAll()" title="Clear both files">✕ Clear</button>
+    <button class="clear-btn" onclick="clearAll()" title="Clear both files">Clear</button>
+    <button class="refactor-btn" onclick="refactorCode()" title="Refactor code using AI">Refactor</button>
   </div>
 
-  <!-- Status Bar -->
   <div class="status-bar" id="statusBar">
     <span class="status-hint">Upload two files to compare them</span>
   </div>
 
-  <!-- Editor Container -->
+  <div id="explanationPanel" class="explanation-panel">
+    <div class="explanationHeader">Refactor Explanation</div>
+    <div id="explanationContent">Click "Refactor" to see AI explanation.
+    </div>
+  </div>
+
 <div id="editorContainer">
   <div class="empty-state" id="emptyState">
     <div class="empty-icon">⇄</div>
@@ -67,8 +70,6 @@
     <div id="diffViewer"></div>
   </div>
 </div>
-
-  <!-- Monaco from CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
   <script src="app.js"></script>
 </body>

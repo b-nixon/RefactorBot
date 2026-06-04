@@ -5,6 +5,32 @@ let modifiedFilename = '';
 let diffEditor = null;
 let editableEditor = null;
 
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+app.post('/api/refactor', async (req, res) => {
+  const { code, description } = req.body;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "user", content: `Refactor the following code based on this description: ${description}\n\n${code}` }
+      ]
+    });
+
+    const refactoredCode = response.choices[0].message.content;
+
+    res.json({ refactoredCode });
+  } catch (error) {
+    console.error('Error occurred while refactoring:', error);
+    res.status(500).json({ error: 'Failed to refactor code' });
+  }
+});
+
 require.config({
   paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' }
 });
@@ -180,4 +206,36 @@ function detectLanguage(filename) {
     rs: 'rust',
   };
   return map[ext] || 'plaintext';
+}
+
+async function refactorCode() {
+  if (!editableEditor) return;
+
+  const code = editableEditor.getValue();
+  try {
+    const response = await fetch('http://localhost:5000/refactor', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+
+    const result = await response.json();
+
+    document.getElementById('explanationContent').innerHTML = 
+      `
+      <strong>Summary</strong><br>
+      ${result.summary.join('<br>')}
+      <br><br>
+      <strong>Explanation</strong><br>
+      ${result.detailedReasoning}
+      `;
+
+    const lang = detectLanguage(originalFilename);
+    diffEditor.setModel({
+      original: monaco.editor.createModel(code, lang),
+      modified: monaco.editor.createModel(result.refactoredCode, lang)
+    });
+  } catch (error) {
+      document.getElementById('explanationContent').textContent = "Refactoring failed" + error.message;
+  }
 }
