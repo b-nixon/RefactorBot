@@ -139,55 +139,42 @@ async function testRefactor(code) {
     };
 }
 
-async function AIRefactor(code){
-    try {
+async function AIRefactor(code) {
+  try {
     const response = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AQ.Ab8RN6LiBt6fEKbLr3NRMtOIQJDXAf6IvbXJUHDay4eOUn5emA",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: `
-Your sole purpose is to refactor the following code.
-
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AQ.Ab8RN6LiBt6fEKbLr3NRMtOIQJDXAf6IvbXJUHDay4eOUn5emA",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Your sole purpose is to refactor the following code.
 Return ONLY valid JSON:
-
 {
   "refactoredCode": "...",
   "reasoning": "..."
 }
-
 Code:
-${code}
-`
-                    }]
-                }]
-            })
-        }
+${code}`
+            }]
+          }]
+        })
+      }
     );
 
     const data = await response.json();
-    console.log(data);
 
+    // ✅ Correctly extract text from Gemini response
     const text = data.candidates[0].content.parts[0].text;
-
     const cleaned = text.replace(/```json/g, "").replace(/```/g, "").trim();
-
     const result = JSON.parse(cleaned);
 
     showDiff(code, result.refactoredCode);
-
     document.getElementById("aiReasoning").textContent = result.reasoning;
 
-    const API_KEY = "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"
-    
-    } catch (error){
-        console.error(error);
-        alert("Refactoring failed.");
-    }
-    
+  } catch (error) {
+    console.error(error);
+    alert("Refactoring failed.");
+  }
 }
