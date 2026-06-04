@@ -140,49 +140,53 @@ async function testRefactor(code) {
 }
 
 async function AIRefactor(code){
-    const API_KEY = "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"
-
-    try{
-        const response = await fetch(
-        "https://api.openai.com/v1/chat/completions",
+    try {
+    const response = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AQ.Ab8RN6LiBt6fEKbLr3NRMtOIQJDXAf6IvbXJUHDay4eOUn5emA",
         {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${API_KEY}`
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                model: "gpt-3.5-turbo",
-                messages: [
-                    {
-                        role: "system",
-                        content: `
-                        You exist solely to refactor code.
-                        Return only valid JSON:
-                        
-                        {
-                        "refactoredCode": "...",
-                        "reasoning": "..."
-                        }`
-                    },
-                    {
-                        role: "user",
-                        content: code
-                    }
-                ]
+                contents: [{
+                    parts: [{
+                        text: `
+Your sole purpose is to refactor the following code.
+
+Return ONLY valid JSON:
+
+{
+  "refactoredCode": "...",
+  "reasoning": "..."
+}
+
+Code:
+${code}
+`
+                    }]
+                }]
             })
         }
-        );
+    );
 
-        const data = await response.json();
+    const data = await response.json();
 
-        const result = JSON.parse(data.choices[0].message.content);
+    const text = data.candidates[0].content.parts[0].text;
 
-        showDiff(code, result.refactoredCode);
+    const cleaned = text.replace(/```json/g, "").replace(/```/g, "").trim();
 
-        document.getElementById("aiReasoning").textContent = result.reasoning;
-    }   catch (error) {
-            console.error(error);
-            alert("Refactoring failed.");
-        }
+    const result = JSON.parse(cleaned);
+
+    showDiff(code, result.refactoredCode);
+
+    document.getElementById("aiReasoning").textContent = result.reasoning;
+
+    const API_KEY = "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"
+    
+    } catch (error){
+        console.error(error);
+        alert("Refactoring failed.");
+    }
+    
 }
