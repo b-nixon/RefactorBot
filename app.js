@@ -1,7 +1,5 @@
 let originalContent = null;
-let modifiedContent = null;
 let originalFilename = '';
-let modifiedFilename = '';
 let diffEditor = null;
 let editableEditor = null;
 

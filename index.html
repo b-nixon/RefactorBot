@@ -32,23 +32,8 @@
       <span class="file-badge" id="badgeOriginal"></span>
     </div>
 
-    <div class="upload-divider">vs</div>
-
-    <div class="upload-slot" id="slotModified">
-      <input type="file" id="fileModified" accept=".js,.py,.java,.cpp,.cs,.rs" />
-      <button class="upload-btn" onclick="document.getElementById('fileModified').click()">
-        <span class="upload-icon">↑</span>
-        <span id="labelModified">Upload Modified</span>
-      </button>
-      <span class="file-badge" id="badgeModified"></span>
-    </div>
-
-    <button class="clear-btn" onclick="clearAll()" title="Clear both files">Clear</button>
+    <button class="clear-btn" onclick="clearAll()" title="Clear all">Clear</button>
     <button class="refactor-btn" onclick="refactorCode()" title="Refactor code using AI">Refactor</button>
-  </div>
-
-  <div class="status-bar" id="statusBar">
-    <span class="status-hint">Upload two files to compare them</span>
   </div>
 
   <div id="explanationPanel" class="explanation-panel">
@@ -58,19 +43,23 @@
   </div>
 
 <div id="editorContainer">
-  <div class="empty-state" id="emptyState">
-    <div class="empty-icon">⇄</div>
-    <div class="empty-title">No files loaded</div>
-    <div class="empty-sub">
+  <div id="workspace">
+    <div class="editor-pane">
+      <div class="pane-header">
+        Original Code
+      </div>
+      <div id="editableEditor"></div>
+    </div>
+    <div class="editor-pane">
+      <div class="pane-header">
+        Refactored Diff
+      </div>
+      <div id="diffViewer"></div>
     </div>
   </div>
-
-  <div id="workspace">
-    <div id="editableEditor"></div>
-    <div id="diffViewer"></div>
-  </div>
 </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
-  <script src="app.js"></script>
+  <script src="test.js"></script>
 </body>
 </html>

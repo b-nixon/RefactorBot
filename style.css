@@ -1,309 +1,115 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Bebas+Neue&display=swap');
-
-:root {
-  --bg:         #0d0d0d;
-  --surface:    #141414;
-  --surface2:   #1c1c1c;
-  --border:     #272727;
-  --border2:    #333;
-  --text:       #e8e4de;
-  --muted:      #555;
-  --muted2:     #888;
-  --accent:     #00e5ff;
-  --accent-dim: rgba(0, 229, 255, 0.12);
-  --green:      #3fb950;
-  --red:        #f85149;
-  --header-h:   52px;
-  --upload-h:   56px;
-  --status-h:   30px;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 html, body {
-  height: 100%;
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'IBM Plex Mono', monospace;
-  overflow: hidden;
+    height: 100%;
+    background-color: black;
+    color: white;
+    font-family: monospace;
 }
 
 header {
-  height: var(--header-h);
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  position: relative;
-  z-index: 10;
-}
+    height: 50px;
+    background-color: #111;
+    border-bottom: 1px solid white;
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-.logo {
-  font-size: 22px;
-  color: var(--accent);
-  line-height: 1;
+    padding: 0 15px;
 }
 
 .title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
-  letter-spacing: 0.1em;
-  color: var(--text);
-}
-
-.title-accent { color: var(--accent); }
-
-.header-right {
-  display: flex;
-  align-items: center;
-}
-
-.toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.toggle-label input { display: none; }
-
-.toggle-track {
-  width: 36px;
-  height: 20px;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: 10px;
-  position: relative;
-  transition: background 0.2s;
-}
-
-.toggle-thumb {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 12px;
-  height: 12px;
-  background: var(--muted2);
-  border-radius: 50%;
-  transition: transform 0.2s, background 0.2s;
-}
-
-.toggle-label input:checked + .toggle-track {
-  background: var(--accent-dim);
-  border-color: var(--accent);
-}
-
-.toggle-label input:checked + .toggle-track .toggle-thumb {
-  transform: translateX(16px);
-  background: var(--accent);
-}
-
-.toggle-text {
-  font-size: 11px;
-  color: var(--muted2);
-  letter-spacing: 0.08em;
+    font-size: 20px;
 }
 
 .upload-bar {
-  height: var(--upload-h);
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  gap: 12px;
+    height: 50px;
+    background-color: #111;
+    border-bottom: 1px solid white;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+    padding: 10px;
 }
 
-.upload-slot {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
+button {
+    background-color: black;
+    color: white;
+    border: 1px solid white;
+
+    padding: 8px 12px;
+    cursor: pointer;
 }
 
-.upload-slot input[type="file"] { display: none; }
-
-.upload-btn {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: 6px;
-  color: var(--muted2);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px;
-  padding: 6px 14px;
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
-  white-space: nowrap;
+button:hover {
+    background-color: white;
+    color: black;
 }
 
-.upload-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-dim);
+input[type="file"] {
+    display: none;
 }
-
-.upload-btn.loaded {
-  border-color: var(--green);
-  color: var(--green);
-  background: rgba(63, 185, 80, 0.08);
-}
-
-.upload-icon {
-  font-size: 14px;
-  line-height: 1;
-}
-
-.file-badge {
-  font-size: 11px;
-  color: var(--muted);
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.upload-divider {
-  font-size: 11px;
-  color: var(--muted);
-  letter-spacing: 0.1em;
-  padding: 0 4px;
-  flex-shrink: 0;
-}
-
-.clear-btn {
-  background: none;
-  border: 1px solid var(--border2);
-  border-radius: 6px;
-  color: var(--muted);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  padding: 6px 12px;
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-  flex-shrink: 0;
-}
-
-.clear-btn:hover {
-  border-color: var(--red);
-  color: var(--red);
-}
-
-.status-bar {
-  height: var(--status-h);
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  gap: 16px;
-  font-size: 11px;
-  color: var(--muted);
-  letter-spacing: 0.04em;
-}
-
-.status-hint { color: var(--muted); }
-
-.stat {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.stat-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.stat-dot.added   { background: var(--green); }
-.stat-dot.removed { background: var(--red); }
 
 #editorContainer {
-  position: absolute;
-  top: calc(var(--header-h) + var(--upload-h) + var(--status-h));
-  left: 0;
-  right: 0;
-  bottom: 0;
+    position: absolute;
+
+    top: 100px;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
-.empty-state {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  pointer-events: none;
+#workspace {
+    display: flex;
+    width: 100%;
+    height: 100%;
 }
 
-.empty-icon {
-  font-size: 48px;
-  color: var(--border2);
-  line-height: 1;
+.editor-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
-.empty-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
-  letter-spacing: 0.15em;
-  color: var(--border2);
+.editor-pane:first-child {
+    border-right: 1px solid white;
 }
 
-.empty-sub {
-  font-size: 12px;
-  color: var(--muted);
-  text-align: center;
-  max-width: 300px;
-  line-height: 1.6;
+.pane-header {
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+
+    padding-left: 10px;
+
+    background-color: #111;
+    border-bottom: 1px solid white;
 }
 
-#diffEditor {
-  width: 100%;
-  height: 100%;
-  display: none; 
-}
-
-.refactor-btn {
-  background: var(--accent-dim);
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  border-radius: 6px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-family: inherit;
+#editableEditor,
+#diffViewer {
+    flex: 1;
 }
 
 #explanationPanel {
-  height: 140px;
-  overflow-y: auto;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-}
+    height: 150px;
+    border-top: 1px solid white;
 
-.explanationHeader {
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--border);
-  font-size: 12px;
-  color: var(--accent);
+    background-color: #111;
+
+    padding: 10px;
+
+    overflow-y: auto;
 }
 
 #explanationContent {
-  padding: 12px;
-  font-size: 12px;
-  line-height: 1.6;
-  white-space: pre-wrap;
+    white-space: pre-wrap;
 }
